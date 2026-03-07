@@ -1,0 +1,5 @@
+plugin/
+pack/
+*.log
+session/
+swap/
