@@ -8,8 +8,11 @@ require("lazy").setup({
 		dependencies = { "nvim-tree/nvim-web-devicons" }
 	},
 
-	{ "EdenEast/nightfox.nvim" } -- nightfox theme
+	{ "EdenEast/nightfox.nvim" }, -- nightfox theme
+	{ "neovim/nvim-lspconfig",},
 })
+
+----------------------------------------------------------
 
 -- close the program if only the tree pane is open...
 -- also allow left and right arrows to expand and collapse directories
@@ -49,13 +52,54 @@ vim.api.nvim_create_autocmd("BufEnter", {
   end,
 })
 
+-- space+t opens terminal
+-- store terminal buffer + window
+local term_buf = nil
+local term_win = nil
+
+vim.g.mapleader = " " -- set leader key to space
+
+-- toggle terminal
+vim.keymap.set('n', '<leader>t', function()
+  -- if window exists, close it (hide terminal)
+  if term_win and vim.api.nvim_win_is_valid(term_win) then
+    vim.api.nvim_win_close(term_win, true)
+    term_win = nil
+    return
+  end
+
+  -- open split at bottom
+  vim.cmd('botright split')
+  vim.cmd('resize 10')
+
+  term_win = vim.api.nvim_get_current_win()
+
+  -- reuse buffer if it exists
+  if term_buf and vim.api.nvim_buf_is_valid(term_buf) then
+    vim.api.nvim_win_set_buf(term_win, term_buf)
+  else
+    vim.cmd('terminal')
+    term_buf = vim.api.nvim_get_current_buf()
+  end
+
+  vim.cmd('startinsert')
+end)
+
+-- space+h hides highlights
+vim.keymap.set('n', '<leader>h', ':noh<CR>')
+
+-- ESC in terminal → hide it
+vim.keymap.set('t', '<Esc>', function()
+  local win = vim.api.nvim_get_current_win()
+  vim.api.nvim_win_close(win, true)
+end, { desc = 'Hide terminal' })
+
 -- neat theme
 vim.opt.termguicolors = true
 vim.cmd("colorscheme nightfox")
 
 -- space + e opens file tree
 -- space + f opens current file in file tree
-vim.g.mapleader = " "
 vim.keymap.set("n", "<leader>e", "<cmd>NvimTreeToggle<CR>")
 vim.keymap.set("n", "<leader>f", ":NvimTreeFindFile<CR>")
 
@@ -79,6 +123,9 @@ vim.opt.mouse = "a"
 -- long tabs
 vim.opt.tabstop = 4
 vim.opt.shiftwidth = 4
+
+-- disable comment indents
+vim.opt.formatoptions:remove({"r", "o", "c"})
 
 -- ignore case
 vim.opt.ignorecase = true
