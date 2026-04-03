@@ -9,7 +9,19 @@ require("lazy").setup({
 	},
 
 	{ "EdenEast/nightfox.nvim" }, -- nightfox theme
+	{ "catppuccin/nvim", lazy = false, name = "catppuccin", priority=1000 }, -- catpuccino theme
 	{ "neovim/nvim-lspconfig",},
+	{
+      'sainnhe/everforest',
+      lazy = false,
+      priority = 1000,
+      config = function()
+        -- Optionally configure and load the colorscheme
+        -- directly inside the plugin declaration.
+        vim.g.everforest_enable_italic = true
+        vim.cmd.colorscheme('everforest')
+      end
+    }
 })
 
 ----------------------------------------------------------
@@ -139,3 +151,15 @@ vim.opt.guicursor = "a:block"
 
 -- scrolling
 vim.opt.scrolloff = 8
+
+-- folding code
+vim.o.foldmethod = "indent"
+vim.o.foldlevel = 99
+vim.o.foldlevelstart = 99
+vim.o.foldenable = true
+
+-- space+n toggles relative line numbers
+
+vim.keymap.set("n", "<leader>n", function()
+  vim.wo.relativenumber = not vim.wo.relativenumber
+end, { desc = "Toggle relative line numbers" })
