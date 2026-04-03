@@ -1,1 +1,9 @@
 sudo apt install nodejs
+sudo apt install npm
+sudo npm install -g tree-sitter-cli
+
+inside nvim...
+:TSUpdate
+
+may need to run...
+:TSInstall lua
